@@ -8,7 +8,7 @@
 ##	:rocket: Iniciando ( Recomendado )
 ```
 //no seu terminal
-__cd backend__
+### cd backend ###
 // recomendamos baixar a imagem do postgres para utilizar-lo em um container docker
 docker run postgres
 // apos a imagem do docker baixar, crie o container para o banco
