@@ -7,7 +7,7 @@
 
 ##	:rocket: Iniciando ( Recomendado )
 ```
-//no seu terminal
+// no seu terminal
 cd backend 
 
 // recomendamos baixar a imagem do postgres para utilizar-lo em um container docker
