@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>Partidas</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <header>
+      <div class="header-top">
+        <div class="logo-header">
+          <a href="../index.html">
+            <img src="../assets/logo1.png" width="150" height="150" />
+          </a>
+        </div>
+
+        <div class="title-page">Partidas</div>
+      </div>
+    </header>
+
+    <main>
+      <section class="cadastro-section">
+        <div class="header-section">Cadastro de Partidas</div>
+        <div class="form-box">
+          <form action="partidas.html" method="post" id="formID">
+            <div class="box-input">
+              <label class="label-form" for="fname">Saldo Time Casa:</label>
+              <input
+                class="input-form"
+                type="number"
+                id="fname"
+                name="saldocasa"
+                value=""
+              /><br />
+            </div>
+
+            <div class="box-input">
+              <label class="label-form" for="fname"
+                >Saldo Time Visitante:</label
+              >
+              <input
+                class="input-form"
+                type="number"
+                id="fname"
+                name="saldovisitante"
+                value=""
+              /><br />
+            </div>
+            <div class="box-input">
+              <label class="label-form" for="jog-casa">Jogadores Casa:</label>
+              <select
+                name="jogadorescasa"
+                id="jog-casa"
+                multiple
+                style="width: 300px; height: 200px; margin: 10px 0"
+              ></select>
+              <br />
+            </div>
+
+            <div class="box-input">
+              <label class="label-form" for="fname"
+                >Jogadores Visitantes:</label
+              >
+              <select
+                name="jogadoresvisitante"
+                id="jog-visi"
+                multiple
+                style="width: 300px; height: 200px; margin: 10px 0"
+              ></select>
+              <br />
+            </div>
+
+            <div class="box-input">
+              <label class="label-form" for="fname">Audiencia:</label>
+              <input
+                class="input-form"
+                type="text"
+                id="fname"
+                name="audiencia"
+                value=""
+              /><br />
+            </div>
+
+            <div class="box-input">
+              <label class="label-form" for="fname">Valor Arrecado:</label>
+              <input
+                class="input-form"
+                type="text"
+                id="fname"
+                name="valorarrecado"
+                value=""
+              /><br />
+            </div>
+
+            <div class="box-input">
+              <label class="label-form" for="fname">Estadio:</label>
+              <select
+                name="estadio"
+                style="width: 300px; height: 30px; margin: 10px 0"
+                id="select-estadio"
+              ></select>
+            </div>
+
+            <div class="box-input">
+              <label class="label-form" for="fname">Data:</label>
+              <input
+                class="input-form"
+                type="date"
+                id="fname"
+                name="data"
+                value=""
+              /><br />
+            </div>
+
+            <div class="box-button">
+              <input class="submit-button" type="submit" value="Enviar" />
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="data-section">
+        <div class="header-section">Listagem de Informações</div>
+
+        <div id="BoxData" class="box-data"></div>
+      </section>
+    </main>
+
+    <script type="text/javascript">
+      let form = document.getElementById("formID");
+
+      form.addEventListener("submit", (event) => {
+        console.log("teste");
+        event.preventDefault();
+
+        const saldocasa = form.elements["saldocasa"];
+        const saldovisitante = form.elements["saldovisitante"];
+
+        var jogadorescasa = Array.prototype.slice
+          .call(document.querySelectorAll("#jog-casa option:checked"), 0)
+          .map(function (v, i, a) {
+            return parseInt(v.value);
+          });
+        var jogadoresvisitante = Array.prototype.slice
+          .call(document.querySelectorAll("#jog-visi option:checked"), 0)
+          .map(function (v, i, a) {
+            return parseInt(v.value);
+          });
+
+        const audiencia = form.elements["audiencia"];
+        const valorarrecado = form.elements["valorarrecado"];
+        const data = form.elements["data"];
+
+        const estadio = form.elements["estadio"];
+
+        sendData(
+          saldocasa.value,
+          saldovisitante.value,
+          jogadorescasa,
+          jogadoresvisitante,
+          audiencia.value,
+          valorarrecado.value,
+          data.value,
+          estadio.value
+        );
+      });
+
+      function sendData(
+        saldocasa,
+        saldovisitante,
+        jogadorescasa,
+        jogadoresvisitante,
+        audiencia,
+        valorarrecado,
+        data,
+        estadio
+      ) {
+        fetch("http://127.0.0.1:3000/partidas/", {
+          method: "post",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify({
+            saldo_time: parseInt(saldocasa),
+            saldo_time_inimigo: parseInt(saldovisitante),
+            jogadores_time: jogadorescasa,
+            jogadores_time_inimigo: jogadoresvisitante,
+            audiencia: parseInt(audiencia),
+            valor_arrecadado: parseFloat(valorarrecado),
+            data: data,
+            estadio: parseInt(estadio),
+          }),
+        }).then((response) => {
+          alert("Cadastrado com sucesso");
+          setTimeout(function () {
+            window.location.reload;
+          }, 3000);
+        });
+      }
+
+      function CreateTable() {
+        const URL = "http://127.0.0.1:3000/partidas/";
+        fetch(URL, {
+          method: "get",
+        }).then(async function (response) {
+          await response.json().then((responseJSON) => {
+            var dados = responseJSON;
+            CreateTableFromJSON(dados.partidas);
+          });
+        });
+        generateSelect();
+      }
+
+      function generateSelect() {
+        fetch("http://127.0.0.1:3000/estadio/", {
+          method: "get",
+        }).then(async function (response) {
+          await response.json().then((responseJSON) => {
+            var dados = responseJSON;
+
+            let estOptionList = document.getElementById("select-estadio")
+              .options;
+            dados.estadio.forEach((dado) =>
+              estOptionList.add(new Option(dado.nome, dado.id))
+            );
+          });
+        });
+
+        fetch("http://127.0.0.1:3000/jogadores/", {
+          method: "get",
+        }).then(async function (response) {
+          await response.json().then((responseJSON) => {
+            var dados = responseJSON;
+
+            let jogCasaOptionList = document.getElementById("jog-casa").options;
+            let jogVisiOptionList = document.getElementById("jog-visi").options;
+            dados.jogadores.forEach((dado) => {
+              jogCasaOptionList.add(new Option(dado.nome, dado.id));
+              jogVisiOptionList.add(new Option(dado.nome, dado.id));
+            });
+          });
+        });
+      }
+
+      function CreateTableFromJSON(dados) {
+        var col = [];
+        for (var i = 0; i < dados.length; i++) {
+          for (var key in dados[i]) {
+            if (col.indexOf(key) === -1) {
+              col.push(key);
+            }
+          }
+        }
+
+        var table = document.createElement("table");
+
+        var tr = table.insertRow(-1);
+
+        for (var i = 0; i < col.length; i++) {
+          var th = document.createElement("th");
+          th.innerHTML = col[i];
+          tr.appendChild(th);
+        }
+
+        for (var i = 0; i < dados.length; i++) {
+          tr = table.insertRow(-1);
+
+          for (var j = 0; j < col.length; j++) {
+            var tabCell = tr.insertCell(-1);
+            tabCell.innerHTML = dados[i][col[j]];
+          }
+        }
+
+        var divContainer = document.getElementById("BoxData");
+        divContainer.innerHTML = "";
+        divContainer.appendChild(table);
+      }
+
+      CreateTable();
+    </script>
+  </body>
+</html>

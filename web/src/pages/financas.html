@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>Finanças</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <script type="text/javascript" src="../index.js"></script>
+    <script src="../api.js" type="module"></script>
+  </head>
+
+  <body>
+    <header>
+      <div class="header-top">
+        <div class="logo-header">
+          <a href="../index.html">
+            <img src="../assets/logo1.png" width="150" height="150" />
+          </a>
+        </div>
+
+        <div class="title-page">Finanças</div>
+      </div>
+    </header>
+
+    <main>
+      <section class="cadastro-section">
+        <div class="header-section">Cadastro de Finanças</div>
+        <div class="form-box">
+          <form action="financas.html" method="post" id="formID">
+            <div class="box-input">
+              <label class="label-form" for="fname">Lucro:</label>
+              <input
+                class="input-form"
+                type="number"
+                id="fname"
+                name="lucro"
+                value=""
+              /><br />
+            </div>
+
+            <div class="box-input">
+              <label class="label-form" for="fname">Prejuizo:</label>
+              <input
+                class="input-form"
+                type="number"
+                id="fname"
+                name="prejuizo"
+                value=""
+              /><br />
+            </div>
+
+            <div class="box-input">
+              <label class="label-form" for="fname">Saldo:</label>
+              <input
+                class="input-form"
+                type="number"
+                id="fname"
+                name="saldo"
+                value=""
+              /><br />
+            </div>
+
+            <div class="box-input">
+              <label class="label-form" for="fname">Transferencias:</label>
+              <input
+                class="input-form"
+                type="number"
+                id="fname"
+                name="transferencias"
+                value=""
+              /><br />
+            </div>
+            <div class="box-input">
+              <label class="label-form" for="fname">Salarios Disponivel:</label>
+              <input
+                class="input-form"
+                type="number"
+                id="fname"
+                name="salariodisponivel"
+                value=""
+              /><br />
+            </div>
+
+            <div class="box-input">
+              <label class="label-form" for="fname">Salarios utilizados:</label>
+              <input
+                class="input-form"
+                type="number"
+                id="fname"
+                name="salarioutilizado"
+                value=""
+              /><br />
+            </div>
+
+            <div class="box-button">
+              <input class="submit-button" type="submit" value="Enviar" />
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="data-section">
+        <div class="header-section">Listagem de Informações</div>
+
+        <div id="BoxData" class="box-data"></div>
+      </section>
+    </main>
+
+    <script type="text/javascript">
+      let form = document.getElementById("formID");
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const lucro = form.elements["lucro"];
+        const prejuizo = form.elements["prejuizo"];
+        const saldo = form.elements["saldo"];
+        const transferencias = form.elements["transferencias"];
+        const salariodisponivel = form.elements["salariodisponivel"];
+        const salarioutilizado = form.elements["salarioutilizado"];
+
+        sendData(
+          lucro.value,
+          prejuizo.value,
+          saldo.value,
+          transferencias.value,
+          salariodisponivel.value,
+          salarioutilizado.value
+        );
+      });
+
+      function sendData(
+        lucro,
+        prejuizo,
+        saldo,
+        transferencias,
+        salariodisponivel,
+        salarioutilizado
+      ) {
+        fetch("http://127.0.0.1:3000/financas/", {
+          method: "post",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify({
+            lucro: lucro,
+            prejuizo: prejuizo,
+            saldo: saldo,
+            transferencias: transferencias,
+            salarios_disponivel: salariodisponivel,
+            salarios_utilizado: salarioutilizado,
+          }),
+        }).then((response) => {
+          alert("Cadastrado com sucesso");
+          setTimeout(function () {
+            window.location.reload;
+          }, 3000);
+        });
+      }
+
+      function CreateTable() {
+        const URL = "http://127.0.0.1:3000/financas/";
+        fetch(URL, {
+          method: "get",
+        }).then(async function (response) {
+          await response.json().then((responseJSON) => {
+            var dados = responseJSON;
+            CreateTableFromJSON(dados.financas);
+          });
+        });
+      }
+
+      function CreateTableFromJSON(dados) {
+        var col = [];
+        for (var i = 0; i < dados.length; i++) {
+          for (var key in dados[i]) {
+            if (col.indexOf(key) === -1) {
+              col.push(key);
+            }
+          }
+        }
+        const notAValue = ["id", "createdAt", "updatedAt"];
+        var table = document.createElement("table");
+
+        var tr = table.insertRow(-1);
+
+        for (var i = 0; i < col.length; i++) {
+          var th = document.createElement("th");
+          th.innerHTML = col[i];
+          tr.appendChild(th);
+        }
+
+        for (var i = 0; i < dados.length; i++) {
+          tr = table.insertRow(-1);
+
+          for (var j = 0; j < col.length; j++) {
+            var tabCell = tr.insertCell(-1);
+            tabCell.innerHTML = notAValue.some((value) =>
+              col[j].includes(value)
+            )
+              ? dados[i][col[j]]
+              : "R$" + dados[i][col[j]];
+          }
+        }
+
+        var divContainer = document.getElementById("BoxData");
+        divContainer.innerHTML = "";
+        divContainer.appendChild(table);
+      }
+
+      CreateTable();
+    </script>
+  </body>
+</html>

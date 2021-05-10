@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>Competições</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <script type="text/javascript" src="../index.js"></script>
+  </head>
+
+  <body>
+    <header>
+      <div class="header-top">
+        <div class="logo-header">
+          <a href="../index.html">
+            <img src="../assets/logo1.png" width="150" height="150" />
+          </a>
+        </div>
+
+        <div class="title-page">Competições</div>
+      </div>
+    </header>
+
+    <main>
+      <section class="cadastro-section">
+        <div class="header-section">Cadastro de Histórico Competições</div>
+        <div class="form-box">
+          <form action="departamentomedico.html" method="post" id="formID">
+            <div class="box-input">
+              <label class="label-form" for="fname">Competição:</label>
+              <input
+                class="input-form"
+                type="text"
+                id="fname"
+                name="competicao"
+                value=""
+              /><br />
+            </div>
+
+            <div class="box-input">
+              <label class="label-form" for="fname">Participações:</label>
+              <input
+                class="input-form"
+                type="number"
+                id="fname"
+                name="participacoes"
+                value=""
+              /><br />
+            </div>
+
+            <div class="box-input">
+              <label class="label-form" for="fname">Troféus:</label>
+              <input
+                class="input-form"
+                type="number"
+                id="fname"
+                name="trofeus"
+                value=""
+              /><br />
+            </div>
+
+            <div class="box-button">
+              <input class="submit-button" type="submit" value="Enviar" />
+            </div>
+          </form>
+        </div>
+      </section>
+      <section class="data-section">
+        <div class="header-section">Listagem de Informações</div>
+
+        <div id="BoxData" class="box-data"></div>
+      </section>
+    </main>
+
+    <script type="text/javascript">
+      let form = document.getElementById("formID");
+
+      form.addEventListener("submit", (event) => {
+        console.log("teste");
+        event.preventDefault();
+
+        const competicao = form.elements["competicao"];
+        const participacoes = form.elements["participacoes"];
+        const trofeus = form.elements["trofeus"];
+
+        sendData(competicao.value, participacoes.value, trofeus.value);
+      });
+
+      function sendData(competicao, participacoes, trofeus) {
+        fetch("http://127.0.0.1:3000/historico-competicoes/", {
+          method: "post",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify({
+            competicao: competicao,
+            participacoes: parseInt(participacoes),
+            trofeus: parseInt(trofeus),
+          }),
+        }).then((response) => {
+          alert("Cadastrado com sucesso");
+          setTimeout(function () {
+            window.location.reload;
+          }, 3000);
+        });
+      }
+
+      function CreateTable() {
+        const URL = "http://127.0.0.1:3000/historico-competicoes/";
+        fetch(URL, {
+          method: "get",
+        }).then(async function (response) {
+          await response.json().then((responseJSON) => {
+            var dados = responseJSON;
+            CreateTableFromJSON(dados.historicoCompeticoes);
+          });
+        });
+      }
+
+      function CreateTableFromJSON(dados) {
+        var col = [];
+        for (var i = 0; i < dados.length; i++) {
+          for (var key in dados[i]) {
+            if (col.indexOf(key) === -1) {
+              col.push(key);
+            }
+          }
+        }
+
+        var table = document.createElement("table");
+
+        var tr = table.insertRow(-1);
+
+        for (var i = 0; i < col.length; i++) {
+          var th = document.createElement("th");
+          th.innerHTML = col[i];
+          tr.appendChild(th);
+        }
+
+        for (var i = 0; i < dados.length; i++) {
+          tr = table.insertRow(-1);
+
+          for (var j = 0; j < col.length; j++) {
+            var tabCell = tr.insertCell(-1);
+            tabCell.innerHTML = dados[i][col[j]];
+          }
+        }
+
+        var divContainer = document.getElementById("BoxData");
+        divContainer.innerHTML = "";
+        divContainer.appendChild(table);
+      }
+
+      CreateTable();
+    </script>
+  </body>
+</html>

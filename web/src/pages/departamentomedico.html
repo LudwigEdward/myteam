@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>Departamento Médico</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <script type="text/javascript" src="../index.js"></script>
+  </head>
+
+  <body>
+    <header>
+      <div class="header-top">
+        <div class="logo-header">
+          <a href="../index.html">
+            <img src="../assets/logo1.png" width="150" height="150" />
+          </a>
+        </div>
+
+        <div class="title-page">Departamento Médico</div>
+      </div>
+    </header>
+
+    <main>
+      <section class="cadastro-section">
+        <div class="header-section">Cadastro de Departamento Médico</div>
+        <div class="form-box">
+          <form action="departamentomedico.html" method="post" id="formID">
+            <div class="box-input">
+              <label class="label-form" for="funcionario">Funcionarios:</label>
+              <select
+                name="funcionario"
+                id="select-jog"
+                multiple
+                style="width: 300px; height: 200px; margin: 10px 0"
+              ></select>
+            </div>
+
+            <div class="box-input">
+              <label class="label-form" for="funcionario">Jogadores:</label>
+              <select
+                name="jogadores"
+                id="select-func"
+                multiple
+                style="width: 300px; height: 200px; margin: 10px 0"
+              ></select>
+            </div>
+
+            <div class="box-button">
+              <input class="submit-button" type="submit" value="Enviar" />
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="data-section">
+        <div class="header-section">Listagem de Informações</div>
+
+        <div id="BoxData" class="box-data"></div>
+      </section>
+    </main>
+
+    <script type="text/javascript">
+      let form = document.getElementById("formID");
+
+      form.addEventListener("submit", (event) => {
+        console.log("teste");
+        event.preventDefault();
+
+        // const funcionario = form.elements["funcionario"];
+        var funcionario = Array.prototype.slice
+          .call(document.querySelectorAll("#select-func option:checked"), 0)
+          .map(function (v, i, a) {
+            return parseInt(v.value);
+          });
+        var jogadores = Array.prototype.slice
+          .call(document.querySelectorAll("#select-jog option:checked"), 0)
+          .map(function (v, i, a) {
+            return parseInt(v.value);
+          });
+        // const jogadores = form.elements["jogadores"];
+
+        sendData(funcionario, jogadores);
+      });
+
+      function sendData(funcionario, jogadores) {
+        fetch("http://127.0.0.1:3000/departamento-medico/", {
+          method: "post",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify({
+            funcionarios: funcionario,
+            jogadores: jogadores,
+          }),
+        }).then((response) => {
+          alert("Cadastrado com sucesso");
+          setTimeout(function () {
+            window.location.reload;
+          }, 3000);
+        });
+      }
+
+      function CreateTable() {
+        const URL = "http://127.0.0.1:3000/departamento-medico/";
+        fetch(URL, {
+          method: "get",
+        }).then(async function (response) {
+          await response.json().then((responseJSON) => {
+            var dados = responseJSON;
+            CreateTableFromJSON(dados.departamentoMedico);
+          });
+        });
+        generateSelect();
+      }
+
+      function generateSelect() {
+        fetch("http://127.0.0.1:3000/jogadores/", {
+          method: "get",
+        }).then(async function (response) {
+          await response.json().then((responseJSON) => {
+            var dados = responseJSON;
+
+            let jogOptionList = document.getElementById("select-jog").options;
+            dados.jogadores.forEach((dado) =>
+              jogOptionList.add(new Option(dado.nome, dado.id))
+            );
+          });
+        });
+
+        fetch("http://127.0.0.1:3000/funcionarios/", {
+          method: "get",
+        }).then(async function (response) {
+          await response.json().then((responseJSON) => {
+            var dados = responseJSON;
+
+            let funcOptionList = document.getElementById("select-func").options;
+            dados.funcionarios.forEach((dado) =>
+              funcOptionList.add(new Option(dado.nome, dado.id))
+            );
+          });
+        });
+      }
+
+      function CreateTableFromJSON(dados) {
+        var col = [];
+        for (var i = 0; i < dados.length; i++) {
+          for (var key in dados[i]) {
+            if (col.indexOf(key) === -1) {
+              col.push(key);
+            }
+          }
+        }
+
+        var table = document.createElement("table");
+
+        var tr = table.insertRow(-1);
+
+        for (var i = 0; i < col.length; i++) {
+          var th = document.createElement("th");
+          th.innerHTML = col[i];
+          tr.appendChild(th);
+        }
+
+        for (var i = 0; i < dados.length; i++) {
+          tr = table.insertRow(-1);
+
+          for (var j = 0; j < col.length; j++) {
+            var tabCell = tr.insertCell(-1);
+            tabCell.innerHTML = dados[i][col[j]];
+          }
+        }
+
+        var divContainer = document.getElementById("BoxData");
+        divContainer.innerHTML = "";
+        divContainer.appendChild(table);
+      }
+
+      CreateTable();
+    </script>
+  </body>
+</html>
